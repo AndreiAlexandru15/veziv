@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios"; // Import Axios
 
 const CreateNewProjectPage = () => {
   const router = useRouter();
@@ -8,6 +9,8 @@ const CreateNewProjectPage = () => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [dragging, setDragging] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   const handleImageDrop = (event) => {
     event.preventDefault();
@@ -38,21 +41,30 @@ const CreateNewProjectPage = () => {
     setDragging(false);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Mock function to add the project
+    setLoading(true); // Set loading state before API call
+    setError(null); // Reset error state
+
     const newProject = {
       title,
       description,
-      image,
+      imageUrl: image, // Adjust based on your API requirements
       createdAt: new Date().toISOString(),
-      status: "active",
+      isVisible: true, // Set default visibility
     };
 
-    console.log("New Project:", newProject);
-    
-    // After adding to the database, redirect to projects page
-    router.push("/projects");
+    try {
+      await axios.post("http://localhost:4000/artworks", newProject); // Adjust the endpoint
+      console.log("New Project:", newProject);
+      // After adding to the database, redirect to projects page
+      router.push("/projects");
+    } catch (err) {
+      console.error("Failed to create project", err);
+      setError("Failed to create project"); // Set error state
+    } finally {
+      setLoading(false); // Reset loading state after API call
+    }
   };
 
   return (
@@ -112,12 +124,16 @@ const CreateNewProjectPage = () => {
           />
         </div>
 
+        {/* Error Message */}
+        {error && <p className="mt-4 text-red-600 text-center">{error}</p>}
+
         {/* Submit Button */}
         <button
           type="submit"
           className="mt-6 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+          disabled={loading} // Disable button during loading
         >
-          Add Project
+          {loading ? "Adding Project..." : "Add Project"}
         </button>
       </form>
     </div>
