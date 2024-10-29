@@ -19,7 +19,10 @@ const Navbar = () => {
 
           <div className="hidden md:flex">
             <Button>
+              <Link href={"/projects/create"}>
+              
               <PlusIcon className="text-white" />
+              </Link>
             </Button>
           </div>
 
@@ -67,7 +70,7 @@ const Navbar = () => {
             Home
           </Link>
           <Link
-            href="/projects/new"
+            href="/projects/create"
             className="block px-3 py-2 rounded-md text-sm font-semibold"
           >
             Add New Project
